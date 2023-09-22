@@ -2,7 +2,7 @@
 
 SRC_IMG="https://cloud-images.ubuntu.com/minimal/releases/jammy/release-20220420/ubuntu-22.04-minimal-cloudimg-amd64.img"
 IMG_NAME="ubuntu-2204.qcow2"
-SRC_CLOUD_CONF="https://todo"
+SRC_CLOUD_CONF="https://raw.githubusercontent.com/SamiHonkasalo/homelab/main/proxmox/cloud-init.yml"
 CLOUD_CONF_NAME="cloud-init.yml"
 
 TEMPLATE_NAME="ubuntu-2204-cloud"
