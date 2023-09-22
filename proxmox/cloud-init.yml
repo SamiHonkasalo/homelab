@@ -1,6 +1,7 @@
 #cloud-config
 users:
   - name: saho
+    groups: [sudo]
     lock_passwd: false
     passwd: $6$rounds=4096$UWXEUsdlup8Lf/cm$nhrniSxvTaJJGaEJ/HxA2x7KRdFpSozT5YWMSudCXtJYosgoHzlD.ZozstFl/4Ev9Pih7rQAuh6R7wiOe2nQK0
     ssh_authorized_keys:
