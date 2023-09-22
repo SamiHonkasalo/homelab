@@ -25,7 +25,7 @@ echo "A vm with Id ${VMID} does not exist, continuing"
 echo "Creating a directory for cloud-init config file"
 mkdir -p /var/lib/vz/cloud-init/
 cd /var/lib/vz/cloud-init/
-wget $SRC_CLOUD_CONF -O CLOUD_CONF_NAME
+wget $SRC_CLOUD_CONF -O $CLOUD_CONF_NAME
 echo "Downloaded ${CLOUD_CONF_NAME}"
 
 
