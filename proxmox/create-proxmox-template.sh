@@ -48,6 +48,7 @@ qm set $VMID --ide2 $DISK_STOR:cloudinit
 qm set $VMID --boot c --bootdisk scsi0
 qm set $VMID --serial0 socket --vga serial0
 qm set $VMID --ipconfig0 ip=dhcp
+qm set $VMID --cicustom "user=local:cloud-init/${CLOUD_CONF_NAME}"
 qm resize $VMID scsi0 $DISK_SIZE
 
 # Convert to template
