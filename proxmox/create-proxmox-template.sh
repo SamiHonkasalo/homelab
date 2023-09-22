@@ -22,6 +22,7 @@ echo "A vm with Id ${VMID} does not exist, continuing"
 
 
 # Download the cloud-init config
+# Note that snippets need to be enabled for the datacenter for local storage
 cd /var/lib/vz/snippets/
 wget $SRC_CLOUD_CONF -O $CLOUD_CONF_NAME
 echo "Downloaded ${CLOUD_CONF_NAME}"
