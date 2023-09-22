@@ -1,0 +1,15 @@
+#cloud-config
+users:
+  - name: saho
+    lock_passwd: false
+    passwd: $6$rounds=4096$UWXEUsdlup8Lf/cm$nhrniSxvTaJJGaEJ/HxA2x7KRdFpSozT5YWMSudCXtJYosgoHzlD.ZozstFl/4Ev9Pih7rQAuh6R7wiOe2nQK0
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2B8Ztuy5vnbGLZPY/Rot3VZVEBQ8Upwb+wuC85djpSSKpc5Pr38wVZVKyQ2nZEf7ioHKiJcSIOm/UhfuKUp8Jyl+bKByzjicHnCRbPY6l4HXXexpj+TuSVJ/ORR9/a+IIBzJnjdTMBzteU8iRSNgk0d6U8s6OIUqZjfq+ZjYMLNet4gzvzUgeudRtCIurwYms0OX5E8uYD1q11DAUuh0edALTAsgeI0aeNuVjwUANYE/4H4SKu/3evO1cjNPfxC46lVc2b+timO4GwvzbwRlgaA1qGmoQ03RxELXCjZysLkG1E3tjONZTwy2M9inrK+isSizEKqF8KtNejAfAN+pYMByfOYDCoBjqDAmys1zmHekg4n5dorUl6rqigqddb/vktegKuNhHSV8LSGRcORt0x4uISmUPJ56h+/IW4Kq191qzmwOgp9hjyMAflXg175P3gKTuDAXZppq98tKVRQe4DBogC5tFthKfSEZTtGcw98HlLS+/N/N4zUCUexBLZ1E= saho@DESKTOP-O12DSBC
+package_upgrade: true
+package_reboot_if_required: true
+locale: fi_FI.utf8
+timezone: Europe/Helsinki
+runcmd:
+  - echo 'todo'
+packages:
+  - containerd
