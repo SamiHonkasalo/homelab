@@ -71,6 +71,12 @@ resource "proxmox_vm_qemu" "k8s_control" {
     host        = local.control.ip
   }
 
+  timeouts {
+    create = "15m"
+    delete = "1m"
+    update = "15m"
+  }
+
   provisioner "remote-exec" {
     # when = create
     inline = [
