@@ -63,7 +63,21 @@ resource "proxmox_vm_qemu" "k8s_control" {
     ssd     = 1
     discard = "on"
   }
+}
 
+resource "time_sleep" "wait_for_cloud_init" {
+  depends_on      = [proxmox_vm_qemu.k8s_control]
+  create_duration = "2m"
+  lifecycle {
+    replace_triggered_by = [proxmox_vm_qemu.k8s_control]
+  }
+}
+
+resource "null_resource" "init_control" {
+  depends_on = [time_sleep.wait_for_cloud_init]
+  lifecycle {
+    replace_triggered_by = [proxmox_vm_qemu.k8s_control]
+  }
   connection {
     type        = "ssh"
     user        = "saho"
@@ -71,14 +85,8 @@ resource "proxmox_vm_qemu" "k8s_control" {
     host        = local.control.ip
   }
 
-  timeouts {
-    create = "15m"
-    delete = "1m"
-    update = "15m"
-  }
-
   provisioner "remote-exec" {
-    # when = create
+    when = create
     inline = [
       "echo '127.0.0.1 ${local.control.name}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${local.control.name}",
@@ -93,6 +101,7 @@ resource "proxmox_vm_qemu" "k8s_control" {
     inline = [
       "chmod +x /tmp/01_install.sh",
       "sudo /tmp/01_install.sh",
+      "exit 0"
     ]
   }
   provisioner "file" {
@@ -103,14 +112,15 @@ resource "proxmox_vm_qemu" "k8s_control" {
     inline = [
       "chmod +x /tmp/02_init-control.sh",
       "sudo /tmp/02_init-control.sh",
+      "exit 0"
     ]
   }
 
   provisioner "local-exec" {
-    # when    = create
-    command = <<EOF
-      rm -rvf ./scripts/03_join.sh
-      ssh saho@${local.control.ip} -o StrictHostKeyChecking=no -i ~/.ssh/pve "kubeadm token create --print-join-command" >> ./scripts/03_join.sh
+    interpreter = ["PowerShell", "-Command"]
+    command     = <<EOF
+      rm ./scripts/03_join.sh
+      ssh saho@${local.control.ip} -o "UserKnownHostsFile=/dev/null" -o StrictHostKeyChecking=no -i ~/.ssh/pve "sudo kubeadm token create --print-join-command" >> ./scripts/03_join.sh
     EOF
   }
 }

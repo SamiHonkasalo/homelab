@@ -22,6 +22,7 @@ sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 # 05 Enable bridging
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+echo 1 > /proc/sys/net/ipv4/ip_forward
 
 # 06 Enable br_netfilter
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
@@ -46,8 +47,5 @@ apt install -y \
 systemctl daemon-reload
 systemctl start kubelet
 systemctl enable kubelet.service
-
-# 09 reboot
-reboot
 
 
