@@ -27,11 +27,14 @@ resource "proxmox_vm_qemu" "k8s_control" {
   target_node = local.target_node
   clone       = local.clone
   vmid        = "1001"
+  qemu_os     = "l26"
+  scsihw      = "virtio-scsi-single"
 
   agent      = 1
   full_clone = true
   vga {
-    type = "serial0"
+    memory = 0
+    type   = "serial0"
   }
   serial {
     id   = 0
@@ -68,19 +71,29 @@ resource "proxmox_vm_qemu" "k8s_control" {
     host        = local.control.ip
   }
 
+  provisioner "file" {
+    source      = "scripts/01_install.sh"
+    destination = "~/temp/01_install.sh"
+  }
+  provisioner "file" {
+    source      = "scripts/02_init-control.sh"
+    destination = "~/temp/02_init-control.sh"
+  }
+
   provisioner "remote-exec" {
-    # when = create
     inline = [
-      "echo '127.0.0.1 ${local.control.name}' | sudo tee -a /etc/hosts",
-      "sudo hostnamectl set-hostname ${local.control.name}",
+      "chmod +x ~/temp/01_install.sh",
+      "chmod +x ~/temp/02_init-control.sh",
+      "sudo ~/temp/01_install.sh",
+      "sudo ~/temp/02_init-control.sh",
     ]
   }
 
   provisioner "remote-exec" {
     # when = create
-    scripts = [
-      "./scripts/01_install.sh",
-      "./scripts/02_init-control.sh"
+    inline = [
+      "echo '127.0.0.1 ${local.control.name}' | sudo tee -a /etc/hosts",
+      "sudo hostnamectl set-hostname ${local.control.name}",
     ]
   }
 
