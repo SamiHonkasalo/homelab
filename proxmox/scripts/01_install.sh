@@ -3,10 +3,10 @@
 # install.sh
 # Run in all k8s nodes and the control plane
 
-# 01 
 
+# 01 Wait for the cache lock to be free
 # 02 install containerd and create the initial config
-apt install -y apt-transport-https ca-certificates curl
+apt-get  -o DPkg::Lock::Timeout=300 install -y apt-transport-https ca-certificates curl
 apt install containerd -y
 mkdir -p /etc/containerd
 containerd config default | tee /etc/containerd/config.toml

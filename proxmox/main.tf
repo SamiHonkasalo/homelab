@@ -71,29 +71,32 @@ resource "proxmox_vm_qemu" "k8s_control" {
     host        = local.control.ip
   }
 
-  provisioner "file" {
-    source      = "scripts/01_install.sh"
-    destination = "/tmp/01_install.sh"
-  }
-  provisioner "file" {
-    source      = "scripts/02_init-control.sh"
-    destination = "/tmp/02_init-control.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/01_install.sh",
-      "chmod +x /tmp/02_init-control.sh",
-      "sudo /tmp/01_install.sh",
-      "sudo /tmp/02_init-control.sh",
-    ]
-  }
-
   provisioner "remote-exec" {
     # when = create
     inline = [
       "echo '127.0.0.1 ${local.control.name}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${local.control.name}",
+    ]
+  }
+
+  provisioner "file" {
+    source      = "scripts/01_install.sh"
+    destination = "/tmp/01_install.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/01_install.sh",
+      "sudo /tmp/01_install.sh",
+    ]
+  }
+  provisioner "file" {
+    source      = "scripts/02_init-control.sh"
+    destination = "/tmp/02_init-control.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/02_init-control.sh",
+      "sudo /tmp/02_init-control.sh",
     ]
   }
 
