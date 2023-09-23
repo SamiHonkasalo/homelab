@@ -47,7 +47,7 @@ qm set $VMID --ide0 $DISK_STOR:cloudinit,media=cdrom
 qm set $VMID --ide2 none,media=cdrom
 qm set $VMID --boot "order=ide2;scsi0;net0;ide0"
 qm set $VMID --serial0 socket --vga serial0
-qm set $VMID --ipconfig0 ip=dhcpz
+qm set $VMID --ipconfig0 ip=dhcp
 qm set $VMID --cicustom "user=local:snippets/${CLOUD_CONF_NAME}"
 qm resize $VMID scsi0 $DISK_SIZE
 
