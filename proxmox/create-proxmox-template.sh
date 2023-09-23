@@ -40,11 +40,12 @@ wget $SRC_IMG -O $IMG_NAME
 virt-customize --install qemu-guest-agent -a $IMG_NAME
 
 # Create cloud-init enabled Proxmox VM
-qm create $VMID --name $TEMPLATE_NAME --memory $MEM --net0 virtio,bridge=$NET_BRIDGE
+qm create $VMID --name $TEMPLATE_NAME --agent 1 --memory $MEM --net0 virtio,bridge=$NET_BRIDGE,firewall=1 --ostype 126
 qm importdisk $VMID $IMG_NAME $DISK_STOR
-qm set $VMID --scsihw virtio-scsi-pci --scsi0 $DISK_STOR:vm-$VMID-disk-0,discard=on,ssd=1
-qm set $VMID --ide2 $DISK_STOR:cloudinit
-qm set $VMID --boot c --bootdisk scsi0
+qm set $VMID --scsihw virtio-scsi-single --scsi0 $DISK_STOR:vm-$VMID-disk-0,discard=on,ssd=1
+qm set $VMID --ide0 $DISK_STOR:cloudinit,media=cdrom
+qm set $VMID --ide2 none,media=cdrom
+qm set $VMID --boot order=ide2;scsi0;net0;ide0
 qm set $VMID --serial0 socket --vga serial0
 qm set $VMID --ipconfig0 ip=dhcp
 qm set $VMID --cicustom "user=local:snippets/${CLOUD_CONF_NAME}"
