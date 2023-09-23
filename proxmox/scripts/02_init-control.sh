@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 01 init cluster
-IP=ip a | grep eth0 | cut -d " " --fields=6 | sed '2q;d' | awk -F'/' '{print $1}'
-HOSTNAME=hostname
+IP=$(ip a | grep eth0 | cut -d " " --fields=6 | sed '2q;d' | awk -F'/' '{print $1}')
+HOSTNAME=$(hostname)
 kubeadm init --control-plane-endpoint=$IP --node-name $HOSTNAME --pod-network-cidr=10.244.0.0/16
 
 # 02 copy kubeconfig

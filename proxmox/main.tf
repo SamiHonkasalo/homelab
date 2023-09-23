@@ -73,19 +73,19 @@ resource "proxmox_vm_qemu" "k8s_control" {
 
   provisioner "file" {
     source      = "scripts/01_install.sh"
-    destination = "~/temp/01_install.sh"
+    destination = "/tmp/01_install.sh"
   }
   provisioner "file" {
     source      = "scripts/02_init-control.sh"
-    destination = "~/temp/02_init-control.sh"
+    destination = "/tmp/02_init-control.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x ~/temp/01_install.sh",
-      "chmod +x ~/temp/02_init-control.sh",
-      "sudo ~/temp/01_install.sh",
-      "sudo ~/temp/02_init-control.sh",
+      "chmod +x /tmp/01_install.sh",
+      "chmod +x /tmp/02_init-control.sh",
+      "sudo /tmp/01_install.sh",
+      "sudo /tmp/02_init-control.sh",
     ]
   }
 

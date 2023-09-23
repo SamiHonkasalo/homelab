@@ -21,7 +21,7 @@ swapoff -a
 sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 # 05 Enable bridging
-sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1' /etc/sysctl.conf
+sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 
 # 06 Enable br_netfilter
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
@@ -30,9 +30,17 @@ EOF
 modprobe br_netfilter
 
 # 07 Install Kubernetes
-curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-apt install kubeadm kubectl kubelet
-apt-mark hold kubelet kubeadm kubectl
+# Download the Google Cloud public signing key:
+curl -fsSL https://dl.k8s.io/apt/doc/apt-key.gpg | gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+# Add the Kubernetes apt repository:
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+
+export KUBERNETES_VERSION=1.28.2
+apt update
+apt install -y \
+   kubeadm=$KUBERNETES_VERSION-00 \
+   kubectl=$KUBERNETES_VERSION-00 \
+   kubelet=$KUBERNETES_VERSION-00
 
 # 08 Enable and start kubelet service
 systemctl daemon-reload
