@@ -24,11 +24,20 @@ sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 echo 1 > /proc/sys/net/ipv4/ip_forward
 
-# 06 Enable br_netfilter
-cat <<EOF | tee /etc/modules-load.d/k8s.conf
+# 06 Network configuration
+cat <<EOF > /etc/modules-load.d/k8s.conf
+overlay
 br_netfilter
 EOF
+
+modprobe overlay
 modprobe br_netfilter
+
+cat <<EOF > /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
 
 # 07 Install Kubernetes
 # Download the Google Cloud public signing key:
@@ -44,6 +53,7 @@ apt install -y \
    kubelet=$KUBERNETES_VERSION-00
 
 # 08 Enable and start kubelet service
+sysctl --system
 systemctl daemon-reload
 systemctl start kubelet
 systemctl enable kubelet.service
