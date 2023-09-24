@@ -36,10 +36,6 @@ resource "proxmox_vm_qemu" "k8s_control" {
     memory = 0
     type   = "serial0"
   }
-  serial {
-    id   = 0
-    type = "socket"
-  }
 
   onboot = true
 
@@ -53,7 +49,7 @@ resource "proxmox_vm_qemu" "k8s_control" {
     model    = "virtio"
     bridge   = "vmbr0"
     macaddr  = local.control.macaddr
-    firewall = true
+    firewall = false
   }
 
   disk {
@@ -65,16 +61,8 @@ resource "proxmox_vm_qemu" "k8s_control" {
   }
 }
 
-resource "time_sleep" "wait_for_cloud_init" {
-  depends_on      = [proxmox_vm_qemu.k8s_control]
-  create_duration = "2m"
-  lifecycle {
-    replace_triggered_by = [proxmox_vm_qemu.k8s_control]
-  }
-}
-
 resource "null_resource" "init_control" {
-  depends_on = [time_sleep.wait_for_cloud_init]
+  depends_on = [proxmox_vm_qemu.k8s_control]
   lifecycle {
     replace_triggered_by = [proxmox_vm_qemu.k8s_control]
   }
@@ -84,6 +72,13 @@ resource "null_resource" "init_control" {
     private_key = file("~/.ssh/pve")
     host        = local.control.ip
   }
+
+  # Need to wait for cloud-init to finish apt install before doing anything else
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
+    command     = "Start-Sleep -s 120"
+  }
+
 
   provisioner "remote-exec" {
     when = create

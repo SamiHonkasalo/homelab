@@ -6,12 +6,15 @@ HOSTNAME=$(hostname)
 USER_HOME=$(getent passwd ${SUDO_USER:-$USER} | cut -d: -f6)
 USER_ID=${SUDO_UID:-$(id -u)}
 GROUP_ID=${SUDO_GID:-$(id -g)}
+echo initializing control plane with IP ${IP} and hostname ${HOSTNAME}
 if kubeadm init --control-plane-endpoint=$IP --node-name $HOSTNAME --pod-network-cidr=10.244.0.0/16 ; then
     # 02 copy kubeconfig
     echo creating directory $USER_HOME/.kube
     mkdir -p $USER_HOME/.kube
     cp -i /etc/kubernetes/admin.conf $USER_HOME/.kube/config
     chown ${USER_ID}:${GROUP_ID} $USER_HOME/.kube/config
+
+    export KUBECONFIG=/etc/kubernetes/admin.conf
 
     # 03 install calico
     kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml

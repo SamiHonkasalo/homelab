@@ -52,10 +52,7 @@ apt install -y \
    kubectl=$KUBERNETES_VERSION-00 \
    kubelet=$KUBERNETES_VERSION-00
 
-# 08 Enable and start kubelet service
+# 08 Reload sysctl
 sysctl --system
-systemctl daemon-reload
-systemctl start kubelet
-systemctl enable kubelet.service
 
 
