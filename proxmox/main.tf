@@ -89,24 +89,45 @@ resource "null_resource" "init_control" {
   }
 
   provisioner "file" {
-    source      = "scripts/01_install.sh"
-    destination = "/tmp/01_install.sh"
+    source      = "scripts/01_setup.sh"
+    destination = "/tmp/01_setup.sh"
   }
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/01_install.sh",
-      "sudo /tmp/01_install.sh",
+      "chmod +x /tmp/01_setup.sh",
+      "sudo /tmp/01_setup.sh",
       "exit 0"
     ]
   }
+
+  # Reboot
+  provisioner "remote-exec" {
+    inline = [
+      "shutdown -r +0",
+      "exit 0"
+    ]
+  }
+
   provisioner "file" {
-    source      = "scripts/02_init-control.sh"
-    destination = "/tmp/02_init-control.sh"
+    source      = "scripts/02_install_k8s.sh"
+    destination = "/tmp/02_install_k8s.sh"
   }
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/02_init-control.sh",
-      "sudo /tmp/02_init-control.sh",
+      "chmod +x /tmp/02_install_k8s.sh",
+      "sudo /tmp/02_install_k8s.sh",
+      "exit 0"
+    ]
+  }
+
+  provisioner "file" {
+    source      = "scripts/03_init_control.sh"
+    destination = "/tmp/03_init_control.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/03_init_control.sh",
+      "sudo /tmp/03_init_control.sh",
       "exit 0"
     ]
   }
