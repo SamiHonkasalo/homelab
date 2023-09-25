@@ -38,6 +38,7 @@ resource "proxmox_vm_qemu" "k8s_control" {
   }
 
   onboot = true
+  boot   = "order=ide2;scsi0;net0;ide0"
 
   cores  = 2
   memory = 4096
@@ -49,7 +50,7 @@ resource "proxmox_vm_qemu" "k8s_control" {
     model    = "virtio"
     bridge   = "vmbr0"
     macaddr  = local.control.macaddr
-    firewall = false
+    firewall = true
   }
 
   disk {
