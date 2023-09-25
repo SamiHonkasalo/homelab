@@ -70,7 +70,6 @@ resource "null_resource" "init_control" {
 
   # Set correct hostname
   provisioner "remote-exec" {
-    when = create
     inline = [
       "echo '127.0.0.1 ${local.control.name}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${local.control.name}",
@@ -208,7 +207,6 @@ resource "null_resource" "init_node" {
 
   # Set correct hostname
   provisioner "remote-exec" {
-    when = create
     inline = [
       "echo '127.0.0.1 ${each.value.name}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${each.value.name}",
