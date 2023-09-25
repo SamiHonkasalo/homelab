@@ -7,18 +7,6 @@ locals {
     macaddr = "A6:0F:D8:EA:26:71"
     ip      = "192.168.0.211"
   }
-  nodes = [
-    {
-      name    = "k8s-node-1"
-      macaddr = "A6:0F:D8:EA:26:72"
-      ip      = "192.168.0.212"
-    },
-    {
-      name    = "k8s-node-2"
-      macaddr = "A6:0F:D8:EA:26:73"
-      ip      = "192.168.0.213"
-    }
-  ]
 }
 
 resource "proxmox_vm_qemu" "k8s_control" {
@@ -79,7 +67,6 @@ resource "null_resource" "init_control" {
     interpreter = ["PowerShell", "-Command"]
     command     = "Start-Sleep -s 120"
   }
-
 
   # Set correct hostname
   provisioner "remote-exec" {
@@ -143,6 +130,7 @@ resource "null_resource" "init_control" {
     command     = <<EOF
       rm ./scripts/03_join.sh
       ssh saho@${local.control.ip} -o "UserKnownHostsFile=/dev/null" -o StrictHostKeyChecking=no -i ~/.ssh/pve "sudo kubeadm token create --print-join-command" >> ./scripts/03_join.sh
+      Set-Content ./scripts/03_join.sh ( (Get-Content ./scripts/03_join.sh -Raw) -replace '\r\n' ,"`n") -NoNewline
     EOF
   }
 
@@ -150,8 +138,127 @@ resource "null_resource" "init_control" {
   provisioner "local-exec" {
     interpreter = ["PowerShell", "-Command"]
     command     = <<EOF
-      scp -i ~/.ssh/pve -r saho@${local.control.ip}~/.kube/config ~/.kube/config
+      scp -i ~/.ssh/pve -o "UserKnownHostsFile=/dev/null" -o StrictHostKeyChecking=no -r saho@${local.control.ip}:~/.kube/config $env:USERPROFILE/.kube/config
     EOF
   }
 }
 
+
+# k8s worker nodes
+resource "proxmox_vm_qemu" "k8s_worker_nodes" {
+  for_each    = var.worker_nodes
+  name        = each.value.name
+  desc        = "Kubernetes node"
+  target_node = local.target_node
+  clone       = local.clone
+  vmid        = each.value.vmid
+  qemu_os     = "l26"
+  scsihw      = "virtio-scsi-single"
+
+  agent      = 1
+  full_clone = true
+  vga {
+    memory = 0
+    type   = "serial0"
+  }
+
+  onboot = true
+  boot   = "order=ide2;scsi0;net0;ide0"
+
+  cores  = 2
+  memory = 4096
+
+  cicustom  = local.cicustom
+  ipconfig0 = "ip=dhcp"
+
+  network {
+    model    = "virtio"
+    bridge   = "vmbr0"
+    macaddr  = each.value.macaddr
+    firewall = true
+  }
+
+  disk {
+    size    = "32G"
+    storage = "local-lvm"
+    type    = "scsi"
+    ssd     = 1
+    discard = "on"
+  }
+}
+
+resource "null_resource" "init_node" {
+  for_each   = var.worker_nodes
+  depends_on = [proxmox_vm_qemu.k8s_worker_nodes, null_resource.init_control]
+  lifecycle {
+    replace_triggered_by = [proxmox_vm_qemu.k8s_worker_nodes]
+  }
+  connection {
+    type        = "ssh"
+    user        = "saho"
+    private_key = file("~/.ssh/pve")
+    host        = each.value.ip
+  }
+
+  # Need to wait for cloud-init to finish apt install before doing anything else
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
+    command     = "Start-Sleep -s 120"
+  }
+
+  # Set correct hostname
+  provisioner "remote-exec" {
+    when = create
+    inline = [
+      "echo '127.0.0.1 ${each.value.name}' | sudo tee -a /etc/hosts",
+      "sudo hostnamectl set-hostname ${each.value.name}",
+    ]
+  }
+
+  # Setup 
+  provisioner "file" {
+    source      = "scripts/01_setup.sh"
+    destination = "/tmp/01_setup.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/01_setup.sh",
+      "sudo /tmp/01_setup.sh",
+      "exit 0"
+    ]
+  }
+
+  # Reboot
+  provisioner "remote-exec" {
+    inline = [
+      "sudo shutdown -r +0",
+      "exit 0"
+    ]
+  }
+
+  # Install k8s 
+  provisioner "file" {
+    source      = "scripts/02_install_k8s.sh"
+    destination = "/tmp/02_install_k8s.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/02_install_k8s.sh",
+      "sudo /tmp/02_install_k8s.sh",
+      "exit 0"
+    ]
+  }
+
+  # Join the cluster
+  provisioner "file" {
+    source      = "scripts/03_join.sh"
+    destination = "/tmp/03_join.sh"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/03_join.sh",
+      "sudo /tmp/03_join.sh",
+      "exit 0"
+    ]
+  }
+}
