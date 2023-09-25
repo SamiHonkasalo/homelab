@@ -52,8 +52,8 @@ resource "proxmox_vm_qemu" "k8s_control" {
 
 resource "null_resource" "init_control" {
   depends_on = [proxmox_vm_qemu.k8s_control]
-  lifecycle {
-    replace_triggered_by = [proxmox_vm_qemu.k8s_control]
+  triggers = {
+    control_id = proxmox_vm_qemu.k8s_control.id
   }
   connection {
     type        = "ssh"
@@ -190,8 +190,8 @@ resource "proxmox_vm_qemu" "k8s_worker_nodes" {
 resource "null_resource" "init_node" {
   for_each   = var.worker_nodes
   depends_on = [proxmox_vm_qemu.k8s_worker_nodes, null_resource.init_control]
-  lifecycle {
-    replace_triggered_by = [proxmox_vm_qemu.k8s_worker_nodes]
+  triggers = {
+    node_id = proxmox_vm_qemu.k8s_worker_nodes[each.key].id
   }
   connection {
     type        = "ssh"
