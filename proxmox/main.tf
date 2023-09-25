@@ -81,6 +81,7 @@ resource "null_resource" "init_control" {
   }
 
 
+  # Set correct hostname
   provisioner "remote-exec" {
     when = create
     inline = [
@@ -89,6 +90,7 @@ resource "null_resource" "init_control" {
     ]
   }
 
+  # Setup 
   provisioner "file" {
     source      = "scripts/01_setup.sh"
     destination = "/tmp/01_setup.sh"
@@ -109,6 +111,7 @@ resource "null_resource" "init_control" {
     ]
   }
 
+  # Install k8s 
   provisioner "file" {
     source      = "scripts/02_install_k8s.sh"
     destination = "/tmp/02_install_k8s.sh"
@@ -121,6 +124,7 @@ resource "null_resource" "init_control" {
     ]
   }
 
+  # Initialize control plane
   provisioner "file" {
     source      = "scripts/03_init_control.sh"
     destination = "/tmp/03_init_control.sh"
@@ -133,6 +137,7 @@ resource "null_resource" "init_control" {
     ]
   }
 
+  # Get the join script
   provisioner "local-exec" {
     interpreter = ["PowerShell", "-Command"]
     command     = <<EOF
@@ -140,4 +145,13 @@ resource "null_resource" "init_control" {
       ssh saho@${local.control.ip} -o "UserKnownHostsFile=/dev/null" -o StrictHostKeyChecking=no -i ~/.ssh/pve "sudo kubeadm token create --print-join-command" >> ./scripts/03_join.sh
     EOF
   }
+
+  # Get kubeconfig
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
+    command     = <<EOF
+      scp -i ~/.ssh/pve -r saho@${local.control.ip}~/.kube/config ~/.kube/config
+    EOF
+  }
 }
+
