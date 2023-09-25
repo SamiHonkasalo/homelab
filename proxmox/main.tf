@@ -97,6 +97,14 @@ resource "null_resource" "init_control" {
     ]
   }
 
+  # Make sure that the reboot is done
+  provisioner "remote-exec" {
+    inline = [
+      "echo rebooted!",
+      "exit 0"
+    ]
+  }
+
   # Install k8s 
   provisioner "file" {
     source      = "scripts/02_install_k8s.sh"
@@ -230,6 +238,14 @@ resource "null_resource" "init_node" {
   provisioner "remote-exec" {
     inline = [
       "sudo shutdown -r +0",
+      "exit 0"
+    ]
+  }
+
+  # Make sure that the reboot is done
+  provisioner "remote-exec" {
+    inline = [
+      "echo rebooted!",
       "exit 0"
     ]
   }
