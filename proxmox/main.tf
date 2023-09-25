@@ -207,12 +207,6 @@ resource "null_resource" "init_node" {
     host        = each.value.ip
   }
 
-  # Need to wait for cloud-init to finish apt install before doing anything else
-  provisioner "local-exec" {
-    interpreter = ["PowerShell", "-Command"]
-    command     = "Start-Sleep -s 120"
-  }
-
   # Set correct hostname
   provisioner "remote-exec" {
     inline = [
