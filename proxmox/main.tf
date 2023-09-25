@@ -104,7 +104,7 @@ resource "null_resource" "init_control" {
   # Reboot
   provisioner "remote-exec" {
     inline = [
-      "shutdown -r +0",
+      "sudo shutdown -r +0",
       "exit 0"
     ]
   }
