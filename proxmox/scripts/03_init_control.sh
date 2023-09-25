@@ -21,13 +21,8 @@ if kubeadm init --control-plane-endpoint=$IP --node-name $HOSTNAME --pod-network
 
     export KUBECONFIG=/etc/kubernetes/admin.conf
 
-    # 03 install calico
-    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
-    sleep 10 # wait for pods
-    curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O
-    # Set the correct ip pool, has to be the same as the one given to kubeadm init
-    sed -i 's/cidr:.*/cidr: 10.244.0.0\/16/' custom-resources.yaml
-    kubectl create -f custom-resources.yaml
+    # 03 install flannel
+    kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
     sleep 60 # more waiting
 else
     echo "kubeadm init failed. Is initialization already done?"
