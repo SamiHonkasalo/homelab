@@ -1,9 +1,9 @@
 [control_planes]
 %{ for vm in control_planes ~}
 ${vm.name} ansible_host=${vm.default_ipv4_address}
-%{ endfor }
+%{ endfor ~}
 
 [nodes]
 %{ for vm in nodes ~}
 ${vm.name} ansible_host=${vm.default_ipv4_address}
-%{ endfor }
+%{ endfor ~}
