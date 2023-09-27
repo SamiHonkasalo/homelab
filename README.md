@@ -20,6 +20,7 @@ Note that the project cannot be run on a Windows machine due to Ansible. Use WSL
 1. Create credentials.auto.tfvars and add the required variables there.
    - Check credentials.sample.tfvars for reference
 2. Make sure that terraform and ansible are installed
+3. Make sure that ansible is intialized (ansible-config init --disabled | sudo tee /etc/ansible/ansible.cfg)
 
 ```bash
   terraform init
