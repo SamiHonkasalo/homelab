@@ -1,1 +1,35 @@
-# TODO
+- name: Check if control plane is already initialized
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: check_init
+
+- name: Set initialized variable
+  set_fact:
+    initialized: "{{ check_init.stat.exists | default(false) }}"
+
+- name: Set is_first_host variable
+  set_fact:
+    is_first_host: inventory_hostname == groups['control_planes'][0]
+
+- name: Initialize the control plane
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16
+  when: initialized == false && is_first_host == true # Initialize only on one control plane
+
+- name: Copy kubeconfig
+  command: |
+    mkdir $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  when: initialized == false && is_first_host == true
+
+- name: Install flannel
+  command: kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+  when: initialized == false && is_first_host == true
+
+- name: Wait for flannel and other pods to be ready
+  wait_for:
+    timeout: 60'
+  when: initialized == false && is_first_host == true
+# TODO:
+# For non-first control planes
+# Get the join command from the first control plane and join the cluster as control planes

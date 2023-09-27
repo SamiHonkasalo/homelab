@@ -1,3 +1,4 @@
+# The first control_plane will be the main one
 [control_planes]
 %{ for vm in control_planes ~}
 ${vm.name} ansible_host=${vm.default_ipv4_address}
