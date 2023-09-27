@@ -31,5 +31,6 @@
     timeout: 60'
   when: initialized == false && is_first_host == true
 # TODO:
+# Install MetalLB
 # For non-first control planes
 # Get the join command from the first control plane and join the cluster as control planes
