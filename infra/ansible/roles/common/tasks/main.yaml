@@ -1,1 +1,68 @@
-# TODO
+- name: Disable swap
+  command: swapoff -a
+
+- name: Disable swap permanently
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: Add docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: Get OS release
+  command: lsb_release -cs
+  register: lsb_rel
+
+- name: Add docker apt repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ lsb_rel.stdout }} stable
+
+- name: Install containerd
+  apt:
+    name: containerd.io
+    update_cache: yes
+
+- name: Configure containerd 1/2
+  command: |
+    mkdir -p /etc/containerd
+    containerd config default | tee /etc/containerd/config.toml
+    sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+- name: Configure containerd 2/2
+  blockinfile:
+    path: "/etc/modules-load.d/containerd.conf"
+    block: |
+      overlay
+      br_netfilter
+
+- name: Enable bridging
+  replace:
+    path: /etc/sysctl.conf
+    regexp: "#net.ipv4.ip_forward=1"
+    replace: net.ipv4.ip_forward=1
+    backup: yes
+
+- name: Reboot
+  reboot:
+
+- name: Add k8s GPG key
+  apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
+
+- name: Add k8s apt repository
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+
+- name: Install k8s
+  apt:
+    name:
+      - kubeadm=1.28.2*
+      - kubectl=1.28.2*
+      - kubelet=1.28.2*
+    update_cache: yes
+
+- name: Hold k8s version
+  command: apt-mark hold kubelet kubeadm kubectl
