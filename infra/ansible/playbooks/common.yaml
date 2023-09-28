@@ -1,3 +1,4 @@
 - hosts: "control_planes, nodes"
+  become: true
   roles:
-    - roles/common
+    - ../roles/common

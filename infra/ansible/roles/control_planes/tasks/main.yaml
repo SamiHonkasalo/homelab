@@ -15,11 +15,17 @@
   command: kubeadm init --pod-network-cidr=10.244.0.0/16
   when: initialized == false && is_first_host == true # Initialize only on one control plane
 
-- name: Copy kubeconfig
-  command: |
-    mkdir $HOME/.kube
-    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+- name: Create .kube directory
+  file:
+    path: $HOME/.kube
+    state: directory
+
+- name: Copy kubeconfig to user directory
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: $HOME/.kube
+    owner: $(id -u)
+    group: $(id -g)
   when: initialized == false && is_first_host == true
 
 - name: Install flannel
