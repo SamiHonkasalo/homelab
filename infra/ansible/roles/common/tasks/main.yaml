@@ -87,8 +87,20 @@
       - kubelet=1.28.2*
     update_cache: yes
 
-- name: Hold k8s version
-  command: apt-mark hold kubelet kubeadm kubectl
+- name: Hold kubeadm
+  dpkg_selections:
+    name: kubeadm
+    selection: hold
+
+- name: Hold kubelet
+  dpkg_selections:
+    name: kubelet
+    selection: hold
+
+- name: Hold kubectl
+  ansible.builtin.dpkg_selections:
+    name: kubectl
+    selection: hold
 
 # TODO: Move to a handler and notify the handler if any common task change
 - name: Reboot
