@@ -34,7 +34,7 @@
 
 - name: Wait for flannel and other pods to be ready
   wait_for:
-    timeout: 60'
+    timeout: 60
   when: initialized == false && is_first_host == true
 # TODO:
 # Install MetalLB
