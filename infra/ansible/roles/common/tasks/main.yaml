@@ -1,3 +1,12 @@
+# Run this first to make sure that apt lock is free from cloud-init
+- name: Install ca-certificates and gnupg
+  apt:
+    name:
+      - ca-certificates
+      - gnupg
+    lock_timeout: 300
+  notify: Restart
+
 - name: Disable swap
   command: swapoff -a
   changed_when: false
@@ -16,12 +25,6 @@
   changed_when: false
   notify: Restart
 
-- name: Install ca-certificates and gnupg
-  apt:
-    name:
-      - ca-certificates
-      - gnupg
-  notify: Restart
 
 - name: Download docker GPG key
   get_url:
