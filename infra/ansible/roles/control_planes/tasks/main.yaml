@@ -42,6 +42,15 @@
   pause:
     seconds: 30
   when: not initialized and is_first_host
+
+- name: Set strictARP to true
+  become_user: "{{ ansible_user }}"
+  shell: |
+    kubectl get configmap kube-proxy -n kube-system -o yaml | \
+    sed -e "s/strictARP: false/strictARP: true/" | \
+    kubectl apply -f - -n kube-system
+  changed_when: false
+  when: not initialized and is_first_host
 # TODO:
 # Install MetalLB
 # For non-first control planes
