@@ -1,3 +1,4 @@
 - hosts: control_planes
+  become: true
   roles:
-    - roles/control_planes
+    - ../roles/control_planes
