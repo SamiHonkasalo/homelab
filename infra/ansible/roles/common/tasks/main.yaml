@@ -3,7 +3,7 @@
     path: /var/lib/cloud/instance/boot-finished
   ignore_errors: true
   ignore_unreachable: true
-  retries: 30
+  retries: 10
   delay: 10
   register: boot_finished
   until: boot_finished.stat.exists
@@ -11,10 +11,8 @@
 
 - name: Wait for connection, if cloud-init restarted the server
   wait_for_connection:
-    delay: 10
     timeout: 60
   changed_when: false
-  when: boot_finished is not success
 
 - name: Install ca-certificates and gnupg
   apt:
