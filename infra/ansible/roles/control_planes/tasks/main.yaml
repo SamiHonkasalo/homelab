@@ -51,7 +51,14 @@
     kubectl apply -f - -n kube-system
   changed_when: false
   when: not initialized and is_first_host
+
+- name: Copy kubeconfig to local
+  become_user: "{{ ansible_user }}"
+  fetch:
+    dest: "~/.kube/config"
+    src: "~/.kube/config"
+    flat: true
+  when: is_first_host
 # TODO:
-# Install MetalLB
 # For non-first control planes
-# Get the join command from the first control plane and join the cluster as control planes
+# Get the join as control plane command from the first control plane and join the cluster as control planes
