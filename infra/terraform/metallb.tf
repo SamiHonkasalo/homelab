@@ -10,28 +10,16 @@ resource "kubernetes_namespace" "metallb" {
   }
 }
 
-resource "helm_release" "metallb" {
-  name       = "metallb"
-  repository = "https://metallb.github.io/metallb"
-  chart      = "metallb"
-  version    = "0.13.11"
-  namespace  = kubernetes_namespace.metallb.metadata[0].name
-
-  # values = [
-  #   "${file("${path.module}/values.yaml")}"
-  # ]
-}
-
 resource "kubectl_manifest" "metallb-addresspool" {
   yaml_body = <<YAML
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: first-pool
-  namespace: ${helm_release.metallb.namespace}
+  namespace: ${kubernetes_namespace.metallb.metadata[0].name}
 spec:
   addresses:
-  - 192.168.0.240
+  - 192.168.0.240-192.168.0.245
 YAML
 }
 
@@ -41,6 +29,19 @@ apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: first-advertisement
-  namespace: ${helm_release.metallb.namespace}
+  namespace: ${kubernetes_namespace.metallb.metadata[0].name}
 YAML
+}
+
+resource "helm_release" "metallb" {
+  depends_on = [kubectl_manifest.metallb-addresspool, kubectl_manifest.metallb-l2-advertisement]
+  name       = "metallb"
+  repository = "https://metallb.github.io/metallb"
+  chart      = "metallb"
+  version    = "0.13.11"
+  namespace  = kubernetes_namespace.metallb.metadata[0].name
+
+  # values = [
+  #   "${file("${path.module}/values.yaml")}"
+  # ]
 }
