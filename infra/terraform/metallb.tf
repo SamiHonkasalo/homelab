@@ -11,7 +11,9 @@ resource "kubernetes_namespace" "metallb" {
 }
 
 resource "kubectl_manifest" "metallb-addresspool" {
-  yaml_body = <<YAML
+  depends_on = [null_resource.ansible_playbook_control_planes]
+  apply_only = true
+  yaml_body  = <<YAML
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -24,7 +26,9 @@ YAML
 }
 
 resource "kubectl_manifest" "metallb-l2-advertisement" {
-  yaml_body = <<YAML
+  depends_on = [null_resource.ansible_playbook_control_planes]
+  apply_only = true
+  yaml_body  = <<YAML
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
