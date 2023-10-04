@@ -1,0 +1,8 @@
+ingress:
+  enabled: false
+
+nginx:
+  enabled: false
+
+cert-manager:
+  enabled: false
