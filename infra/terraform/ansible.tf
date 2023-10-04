@@ -35,9 +35,9 @@ resource "ansible_host" "nodes" {
 # This can be triggered always, since ansible will handle the state
 resource "null_resource" "ansible_playbook_common" {
   depends_on = [ansible_host.control_planes, ansible_host.nodes]
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  # triggers = {
+  #   always_run = "${timestamp()}"
+  # }
   provisioner "local-exec" {
     command = "ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i ${path.module}/../ansible/inventory.yaml ${path.module}/../ansible/playbooks/common.yaml"
   }
@@ -45,9 +45,9 @@ resource "null_resource" "ansible_playbook_common" {
 
 resource "null_resource" "ansible_playbook_control_planes" {
   depends_on = [null_resource.ansible_playbook_common]
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  # triggers = {
+  #   always_run = "${timestamp()}"
+  # }
   provisioner "local-exec" {
     command = "ansible-playbook -i ${path.module}/../ansible/inventory.yaml ${path.module}/../ansible/playbooks/control_planes.yaml"
   }
@@ -55,9 +55,9 @@ resource "null_resource" "ansible_playbook_control_planes" {
 
 resource "null_resource" "ansible_playbook_nodes" {
   depends_on = [null_resource.ansible_playbook_control_planes]
-  triggers = {
-    always_run = "${timestamp()}"
-  }
+  # triggers = {
+  #   always_run = "${timestamp()}"
+  # }
   provisioner "local-exec" {
     command = "ansible-playbook -i ${path.module}/../ansible/inventory.yaml ${path.module}/../ansible/playbooks/nodes.yaml"
   }
