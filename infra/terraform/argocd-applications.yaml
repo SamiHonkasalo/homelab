@@ -13,6 +13,8 @@ spec:
   source:
     repoURL: https://github.com/SamiHonkasalo/homelab.git
     path: infra/applications
+    directory:
+      recurse: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argocd
