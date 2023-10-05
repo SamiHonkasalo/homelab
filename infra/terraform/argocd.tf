@@ -14,6 +14,9 @@ resource "helm_release" "argocd" {
 
 resource "null_resource" "deploy_argo_apps" {
   depends_on = [helm_release.argocd]
+  triggers = {
+    file_sha = filesha1("${path.module}/argocd-applications.yaml")
+  }
   provisioner "local-exec" {
     command = "kubectl apply -f ${path.module}/argocd-applications.yaml"
   }
