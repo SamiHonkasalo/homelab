@@ -15,9 +15,10 @@ resource "helm_release" "argocd" {
 resource "null_resource" "deploy_argo_apps" {
   depends_on = [helm_release.argocd]
   triggers = {
-    dir_sha1 = sha1(join("", [for f in fileset("${path.module}/../applications", "*") : filesha1(f)]))
+    dir_sha1  = sha1(join("", [for f in fileset("${path.module}/../applications", "*") : filesha1(f)]))
+    main_sha1 = filesha1("${path.module}/argocd-applications.yaml")
   }
   provisioner "local-exec" {
-    command = "kubectl apply -R -f ${path.module}/../applications"
+    command = "kubectl apply -f ${path.module}/argocd-applications.yaml"
   }
 }
