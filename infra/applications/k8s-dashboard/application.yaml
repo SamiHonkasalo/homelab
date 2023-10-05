@@ -8,13 +8,17 @@ spec:
   syncPolicy:
     automated:
       prune: true
-  source:
-    chart: kubernetes-dashboard
-    repoURL: https://kubernetes.github.io/dashboard
-    targetRevision: 7.0.0-alpha1
-    helm:
-      valueFiles:
-        - values.yaml
+  syncOptions:
+    - CreateNamespace=true
+  sources:
+    - repoURL: https://kubernetes.github.io/dashboard
+      chart: kubernetes-dashboard
+      targetRevision: 7.0.0-alpha1
+      helm:
+        valueFiles:
+          - $values/infra/applications/k8s-dashboard/values.yaml
+    - repoURL: https://github.com/SamiHonkasalo/homelab.git
+      ref: values
   destination:
     server: "https://kubernetes.default.svc"
     namespace: kubernetes-dashboard
