@@ -15,7 +15,7 @@ resource "helm_release" "argocd" {
 resource "null_resource" "deploy_argo_apps" {
   depends_on = [helm_release.argocd]
   triggers = {
-    dir_sha1  = sha1(join("", [for f in fileset("${path.module}/../applications", "*") : filesha1(f)]))
+    dir_sha1  = sha1(join("", [for f in fileset("${path.module}/../applications", "*.yaml") : filesha1("${"${path.module}/../applications"}/${f}")]))
     main_sha1 = filesha1("${path.module}/argocd-applications.yaml")
   }
   provisioner "local-exec" {
