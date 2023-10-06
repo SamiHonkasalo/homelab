@@ -1,0 +1,6 @@
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - vault.192.168.0.240.nip.io
