@@ -16,6 +16,3 @@ server:
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     hosts:
       - grpc.argocd.192.168.0.240.nip.io
-configs:
-  params:
-    server.insecure: "true"
