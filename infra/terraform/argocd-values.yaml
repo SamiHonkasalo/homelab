@@ -3,4 +3,4 @@ server:
     enabled: true
     ingressClassName: nginx
     hosts:
-      - 192.168.0.211.argo.nip.io
+      - argocd.192.168.0.211.nip.io
