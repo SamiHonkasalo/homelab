@@ -3,4 +3,8 @@ server:
     enabled: true
     ingressClassName: nginx
     hosts:
-      - vault.192.168.0.240.nip.io
+      - host: vault.192.168.0.240.nip.io
+
+ui:
+  enabled: true
+  serviceType: LoadBalancer
