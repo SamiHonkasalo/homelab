@@ -1,6 +1,17 @@
 server:
+  insecure: true
   ingress:
     enabled: true
     ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     hosts:
-      - argocd.192.168.0.211.nip.io
+      - argocd.192.168.0.240.nip.io
+  ingressGrpc:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    hosts:
+      - grpc.argocd.192.168.0.240.nip.io
