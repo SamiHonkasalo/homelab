@@ -1,6 +1,6 @@
 server:
   ingress:
     enabled: true
-    ingressClassName: "nginx"
+    ingressClassName: nginx
     hosts:
-      - 192.168.0.211.nip.io
+      - 192.168.0.211.argo.nip.io
