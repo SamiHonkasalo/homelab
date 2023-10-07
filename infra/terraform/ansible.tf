@@ -36,7 +36,7 @@ resource "ansible_host" "nodes" {
 resource "null_resource" "ansible_playbook_common" {
   depends_on = [ansible_host.control_planes, ansible_host.nodes]
   lifecycle {
-    replace_triggered_by = [ansible_host.control_planes, ansible_host.nodes]
+    replace_triggered_by = [proxmox_vm_qemu.k8s_control_plane, proxmox_vm_qemu.k8s_node]
   }
   triggers = {
     roles    = sha1(join("", [for f in fileset("${path.module}/../ansible/playbooks/roles/common", "*.yaml") : filesha1("${"${path.module}/../ansible/playbooks/roles/common"}/${f}")]))
@@ -50,7 +50,7 @@ resource "null_resource" "ansible_playbook_common" {
 resource "null_resource" "ansible_playbook_control_planes" {
   depends_on = [null_resource.ansible_playbook_common]
   lifecycle {
-    replace_triggered_by = [ansible_host.control_planes]
+    replace_triggered_by = [proxmox_vm_qemu.k8s_control_plane]
   }
   triggers = {
     roles    = sha1(join("", [for f in fileset("${path.module}/../ansible/playbooks/roles/control_planes", "*.yaml") : filesha1("${"${path.module}/../ansible/playbooks/roles/control_planes"}/${f}")]))
@@ -64,7 +64,7 @@ resource "null_resource" "ansible_playbook_control_planes" {
 resource "null_resource" "ansible_playbook_nodes" {
   depends_on = [null_resource.ansible_playbook_control_planes]
   lifecycle {
-    replace_triggered_by = [ansible_host.nodes]
+    replace_triggered_by = [proxmox_vm_qemu.k8s_node]
   }
   triggers = {
     roles    = sha1(join("", [for f in fileset("${path.module}/../ansible/playbooks/roles/nodes", "*.yaml") : filesha1("${"${path.module}/../ansible/playbooks/roles/nodes"}/${f}")]))
