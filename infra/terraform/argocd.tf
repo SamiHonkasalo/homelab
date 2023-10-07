@@ -1,4 +1,5 @@
 resource "helm_release" "argocd" {
+  depends_on       = [null_resource.ansible_playbook_nodes]
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
