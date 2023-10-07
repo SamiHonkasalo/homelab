@@ -1,5 +1,5 @@
 resource "helm_release" "longhorn" {
-  depends_on       = [null_resource.ansible_playbook_nodes]
+  depends_on       = [helm_release.ingress-nginx]
   name             = "longhorn"
   repository       = "https://charts.longhorn.io"
   chart            = "longhorn"
