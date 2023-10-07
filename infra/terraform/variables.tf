@@ -59,7 +59,7 @@ variable "nodes" {
     }
     "3" = {
       vmid    = 1004
-      name    = "k8s-node-4"
+      name    = "k8s-node-3"
       macaddr = "A6:0F:D8:EA:26:74"
     }
   }
