@@ -7,6 +7,4 @@ server:
 
 ui:
   enabled: true
-  serviceType: LoadBalancer
-  annotations:
-    argocd.argoproj.io/skip-health-check: "true"
+  serviceType: ClusterIP
