@@ -22,6 +22,14 @@
     update_cache: yes
   notify: Restart
 
+# Longhorn requirements
+- name: Install nfs-common and open-iscsi
+  apt:
+    name:
+      - nfs-common
+      - open-iscsi
+  notify: Restart
+
 - name: Set hostname
   hostname:
     name: "{{ hostname }}"
