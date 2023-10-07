@@ -1,5 +1,4 @@
 ingress:
   enabled: true
-  hosts:
-    - longhorn.192.168.0.240.nip.io
+  host: longhorn.192.168.0.240.nip.io
   ingressClassName: nginx
