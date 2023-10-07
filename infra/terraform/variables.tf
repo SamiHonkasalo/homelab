@@ -57,6 +57,11 @@ variable "nodes" {
       name    = "k8s-node-2"
       macaddr = "A6:0F:D8:EA:26:73"
     }
+    "3" = {
+      vmid    = 1004
+      name    = "k8s-node-4"
+      macaddr = "A6:0F:D8:EA:26:74"
+    }
   }
 }
 
