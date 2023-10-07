@@ -1,5 +1,5 @@
 resource "kubernetes_namespace" "metallb" {
-  depends_on = [null_resource.ansible_playbook_control_planes]
+  depends_on = [null_resource.ansible_playbook_nodes]
   metadata {
     labels = {
       "pod-security.kubernetes.io/enforce" = "privileged"
@@ -11,7 +11,7 @@ resource "kubernetes_namespace" "metallb" {
 }
 
 resource "null_resource" "apply_metallb_crds" {
-  depends_on = [null_resource.ansible_playbook_control_planes]
+  depends_on = [kubernetes_namespace.metallb]
   triggers = {
     file_sha = filesha1("${path.module}/metallb-manifests.yaml")
   }
